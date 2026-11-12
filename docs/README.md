@@ -1,3 +1,7 @@
+<div align="center">
+<img src="images/logo.png" alt="HIVE logo" width="200">
+</div>
+
 # HIVE
 
 **Hive Infrastructure Versioning Engine** deploys a

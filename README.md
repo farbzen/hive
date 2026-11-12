@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src=".assets/logo.png" alt="HIVE logo" width="200">
+
 # HIVE
 
 _Hive Infrastructure Versioning Engine_
