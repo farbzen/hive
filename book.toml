@@ -1,0 +1,11 @@
+[book]
+title = "HIVE"
+description = "Deploy a colmena hive and record every deployment as a git commit."
+language = "en"
+src = "docs"
+
+[output.html]
+site-url = "/"
+cname = "hive.farbzen.de"
+git-repository-url = "https://github.com/farbzen/hive"
+edit-url-template = "https://github.com/farbzen/hive/edit/main/docs/{path}"

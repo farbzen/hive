@@ -1,0 +1,119 @@
+name: Rust
+
+on:
+  push:
+    branches: [main]
+    paths: &rust-paths
+      - Cargo.toml
+      - Cargo.lock
+      - hive/**
+      - hive-tui/**
+      - devenv.nix
+      - devenv.yaml
+      - devenv.lock
+      - .github/workflows/rust.yml
+  pull_request:
+    paths: *rust-paths
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: rust-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint:
+    name: Format and clippy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: cachix/install-nix-action@v31.11.3
+
+      - uses: cachix/cachix-action@v17
+        with:
+          name: devenv
+
+      - name: Install devenv
+        run: nix profile add nixpkgs#devenv
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: devenv shell -- cargo fmt --all --check
+
+      - name: Run clippy
+        run: devenv shell -- cargo clippy --workspace --all-targets --locked -- -D warnings
+
+  test:
+    name: Test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: cachix/install-nix-action@v31.11.3
+
+      - uses: cachix/cachix-action@v17
+        with:
+          name: devenv
+
+      - name: Install devenv
+        run: nix profile add nixpkgs#devenv
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Run tests
+        run: devenv shell -- cargo test --workspace --locked
+
+  build:
+    name: Build (${{ matrix.system }})
+    if: github.event_name == 'release'
+    needs: [lint, test]
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        include:
+          - system: x86_64-linux
+            runner: ubuntu-24.04
+          - system: aarch64-linux
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: cachix/install-nix-action@v31.11.3
+
+      - uses: cachix/cachix-action@v17
+        with:
+          name: devenv
+
+      - name: Install devenv
+        run: nix profile add nixpkgs#devenv
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build release binaries
+        run: devenv shell -- cargo build --workspace --release --locked
+
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: hive-${{ matrix.system }}
+          path: |
+            target/release/hive
+            target/release/hive-tui
+          if-no-files-found: error
+
+      - name: Attach binaries to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+          SYSTEM: ${{ matrix.system }}
+        run: |
+          cp target/release/hive "hive-$SYSTEM"
+          cp target/release/hive-tui "hive-tui-$SYSTEM"
+          gh release upload "$TAG" "hive-$SYSTEM" "hive-tui-$SYSTEM" --clobber

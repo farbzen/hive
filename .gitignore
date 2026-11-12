@@ -1,0 +1,7 @@
+result
+result-*
+.devenv/
+.direnv/
+/target
+/.claude
+/book
