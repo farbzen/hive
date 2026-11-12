@@ -51,28 +51,3 @@ nix run github:farbzen/hive#hive-tui
 > both binaries on the `PATH`. Both are wrapped with
 > [colmena](https://github.com/zhaofengli/colmena) and git, which HIVE calls
 > for the deployment and the commits. nix is taken from the NixOS system.
-
-## Install without the flake
-
-[`package.nix`](https://github.com/farbzen/hive/blob/main/package.nix) is a self-contained derivation in nixpkgs
-style: it fetches the tagged release with `fetchFromGitHub` and builds it with
-the nixpkgs of the importing configuration. Copy it into the configuration,
-for example as `hive.nix`, and call it:
-
-```nix
-{pkgs, ...}: {
-  environment.systemPackages = [(pkgs.callPackage ./hive.nix {})];
-}
-```
-
-> [!IMPORTANT]
-> Copy `package.nix` from `main`, not from a release tag: the hashes of a
-> release are committed after its tag.
-
-To switch to another release, change `version` and set `hash` and `cargoHash`
-to `""`. The next build fails and prints the correct hashes in its `got:`
-lines; paste each in place of its `""`.
-
-> [!NOTE]
-> This works without flakes; the build uses the nixpkgs revision of the
-> configuration.

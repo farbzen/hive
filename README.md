@@ -89,9 +89,6 @@ environment.systemPackages = [pkgs.hive];
 > `hive` and `hive-tui` are the same derivation; installing one of them puts
 > both binaries on the `PATH`.
 
-Without the flake, copy [`package.nix`](package.nix) into the configuration
-and add `(pkgs.callPackage ./hive.nix {})` to `environment.systemPackages`.
-
 The full examples are in [docs/installation.md](docs/installation.md).
 
 ### Usage

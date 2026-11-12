@@ -46,7 +46,7 @@ tests have passed, a build job runs `cargo build --workspace --release
 ```sh
 nix build .#hive          # build the workspace
 nix flake check           # evaluate all outputs
-nix run nixpkgs#alejandra -- flake.nix package.nix
+nix run nixpkgs#alejandra -- flake.nix
 ```
 
 > [!IMPORTANT]
@@ -60,14 +60,9 @@ nix run nixpkgs#alejandra -- flake.nix package.nix
 | `Cargo.toml`  | Cargo workspace with the shared version, edition and license |
 | `hive/`       | `hive` crate: library and command-line tool                  |
 | `hive-tui/`   | `hive-tui` crate: terminal frontend                          |
-| `package.nix` | standalone derivation that fetches a release from GitHub     |
-| `flake.nix`   | flake outputs; builds `package.nix` from the local checkout  |
+| `flake.nix`   | flake outputs; builds the workspace from the local checkout  |
 | `docs/`       | documentation, also the source of the documentation site     |
 | `book.toml`   | [mdBook](https://rust-lang.github.io/mdBook/) configuration  |
-
-The flake overrides `src`, `version` and `cargoDeps` of `package.nix` with the
-local workspace, so `hash` and `cargoHash` in `package.nix` only matter for
-builds outside the flake.
 
 ## Documentation site
 
@@ -93,23 +88,13 @@ repository.
 
 ## Release
 
-1. Set the new version in `Cargo.toml`, `package.nix` and the version badge of
-   `README.md`, run `cargo check` to update `Cargo.lock`, and move the
-   `Unreleased` entries in `CHANGELOG.md` to a new `[<version>] - <date>`
-   section with its link at the end of the file.
+1. Set the new version in `Cargo.toml` and the version badge of `README.md`,
+   run `cargo check` to update `Cargo.lock`, and move the `Unreleased` entries
+   in `CHANGELOG.md` to a new `[<version>] - <date>` section with its link at
+   the end of the file.
 2. Commit as `chore(release): <version>`, tag the commit as `v<version>` and
    push `main` and the tag.
-3. Set `hash` and `cargoHash` in `package.nix` to `""` and build the
-   derivation outside the flake:
-
-   ```sh
-   nix build --impure --expr 'with import <nixpkgs> {}; callPackage ./package.nix {}'
-   ```
-
-   The first build fails on `hash`, the second on `cargoHash`; paste the
-   value of each `got:` line in place of its `""`, then build once more.
-4. Commit and push the updated `package.nix`.
-5. Publish the GitHub release with the changelog section as notes, which
+3. Publish the GitHub release with the changelog section as notes, which
    starts the build job that attaches the binaries:
 
    ```sh

@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Removed
+
+- Standalone `package.nix`; the flake now defines the derivation itself and
+  is the only supported way to install HIVE with Nix.
+
 ## [1.0.0] - 2026-11-12
 
 ### Added
