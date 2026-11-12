@@ -8,11 +8,6 @@ and this project adheres to
 
 ## [Unreleased]
 
-### Removed
-
-- Standalone `package.nix`; the flake now defines the derivation itself and
-  is the only supported way to install HIVE with Nix.
-
 ## [1.0.0] - 2026-11-12
 
 ### Added
@@ -41,8 +36,6 @@ and this project adheres to
   and `git` on their `PATH`.
 - MIT license, declared in the Cargo manifests and in the `meta.license` of
   the Nix packages.
-- Standalone `package.nix` that fetches a tagged release via
-  `fetchFromGitHub`.
 - Unit tests for argument parsing, the node selector and its resolution, tilde
   expansion, the commit message, the TUI's command line, hints, node, tag and
   input selection, and reading the flake inputs from the lock file.
